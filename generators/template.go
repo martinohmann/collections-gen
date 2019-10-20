@@ -1,13 +1,13 @@
 package generators
 
 var collectionCode = `
-// {{.type|public}} is a{{if .immutable}}n immutable{{end}} collection of {{.type|raw}} values.
+// {{.type|public}} is a{{if .immutable}}n immutable{{end}} collection of {{.elemtype|raw}} values.
 type {{.type|public}} struct {
-	items []{{.type|raw}}
+	items []{{.elemtype|raw}}
 }
 
-// New{{.type|public}} creates a new{{if .immutable}} immutable{{end}} collection from a slice of {{.type|raw}}.
-func New{{.type|public}}(items []{{.type|raw}}) *{{.type|public}} {
+// New{{.type|public}} creates a new{{if .immutable}} immutable{{end}} collection from a slice of {{.elemtype|raw}}.
+func New{{.type|public}}(items []{{.elemtype|raw}}) *{{.type|public}} {
 	return &{{.type|public}}{items}
 }
 
@@ -17,30 +17,30 @@ func (c *{{.type|public}}) Interface() interface{} {
 	return c.items
 }
 
-// Items returns the underlying slice of {{.type|raw}} values used by the
+// Items returns the underlying slice of {{.elemtype|raw}} values used by the
 // collection.
-func (c *{{.type|public}}) Items() []{{.type|raw}} {
+func (c *{{.type|public}}) Items() []{{.elemtype|raw}} {
 	return c.items
 }
 
 // EachIndex calls fn for every item in the collection. The slice index of the
 // item is passed to fn as the second argument.
-func (c *{{.type|public}}) EachIndex(fn func({{.type|raw}}, int)) {
+func (c *{{.type|public}}) EachIndex(fn func({{.elemtype|raw}}, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
 // Each calls fn for every item in the collection.
-func (c *{{.type|public}}) Each(fn func({{.type|raw}})) {
-	c.EachIndex(func(item {{.type|raw}}, _ int) {
+func (c *{{.type|public}}) Each(fn func({{.elemtype|raw}})) {
+	c.EachIndex(func(item {{.elemtype|raw}}, _ int) {
 		fn(item)
 	})
 }
 
 // IndexOf searches for el in the collection and returns the first index where
 // el is found. If el is not present in the collection IndexOf will return -1.
-func (c *{{.type|public}}) IndexOf(el {{.type|raw}}) int {
+func (c *{{.type|public}}) IndexOf(el {{.elemtype|raw}}) int {
 	for i, item := range c.items {
 {{ if .equalityFunc -}}
 		if {{.equalityFunc}}(item, el) {
@@ -56,13 +56,13 @@ func (c *{{.type|public}}) IndexOf(el {{.type|raw}}) int {
 
 // First returns the first item from the collection. Will panic if the
 // underlying slice is empty.
-func (c *{{.type|public}}) First() {{.type|raw}} {
+func (c *{{.type|public}}) First() {{.elemtype|raw}} {
 	return c.Nth(0)
 }
 
-// FirstN returns the first n {{.type|raw}} items of the collection. Will
+// FirstN returns the first n {{.elemtype|raw}} items of the collection. Will
 // return less than n items if the underlying slice's length is < n.
-func (c *{{.type|public}}) FirstN(n int) []{{.type|raw}} {
+func (c *{{.type|public}}) FirstN(n int) []{{.elemtype|raw}} {
 	if n > c.Len() {
 {{ if .immutable -}}
         return c.Copy().Items()
@@ -76,13 +76,13 @@ func (c *{{.type|public}}) FirstN(n int) []{{.type|raw}} {
 
 // Last returns the last item from the collection. Will panic if the underlying
 // slice is empty.
-func (c *{{.type|public}}) Last() {{.type|raw}} {
+func (c *{{.type|public}}) Last() {{.elemtype|raw}} {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns the last n {{.type|raw}} items of the collection. Will return
+// LastN returns the last n {{.elemtype|raw}} items of the collection. Will return
 // less than n items if the underlying slice's length is < n.
-func (c *{{.type|public}}) LastN(n int) []{{.type|raw}} {
+func (c *{{.type|public}}) LastN(n int) []{{.elemtype|raw}} {
 	if c.Len()-n < 0 {
 {{ if .immutable -}}
         return c.Copy().Items()
@@ -96,29 +96,29 @@ func (c *{{.type|public}}) LastN(n int) []{{.type|raw}} {
 
 // Get returns the item at pos from the collection. Will panic if the
 // underlying slice is shorter than pos+1.
-func (c *{{.type|public}}) Get(pos int) {{.type|raw}} {
+func (c *{{.type|public}}) Get(pos int) {{.elemtype|raw}} {
 	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
 // slice is shorter than pos+1.
-func (c *{{.type|public}}) Nth(pos int) {{.type|raw}} {
+func (c *{{.type|public}}) Nth(pos int) {{.elemtype|raw}} {
 	return c.items[pos]
 }
 
-// Len returns the length of the underlying {{.type|raw}} slice.
+// Len returns the length of the underlying {{.elemtype|raw}} slice.
 func (c *{{.type|public}}) Len() int {
 	return len(c.items)
 }
 
-// Cap returns the capacity of the underlying {{.type|raw}} slice.
+// Cap returns the capacity of the underlying {{.elemtype|raw}} slice.
 func (c *{{.type|public}}) Cap() int {
 	return cap(c.items)
 }
 
 // Append appends items and returns the collection.{{if .immutable}} The
 // original collection will not be modified.{{end}}
-func (c *{{.type|public}}) Append(items ...{{.type|raw}}) *{{.type|public}} {
+func (c *{{.type|public}}) Append(items ...{{.elemtype|raw}}) *{{.type|public}} {
 {{ if .immutable -}}
 	d := c.Copy()
 	d.items = append(d.items, items...)
@@ -131,7 +131,7 @@ func (c *{{.type|public}}) Append(items ...{{.type|raw}}) *{{.type|public}} {
 
 // Prepend prepends items and returns the collection.{{if .immutable}} The
 // original collection will not be modified.{{end}}
-func (c *{{.type|public}}) Prepend(items ...{{.type|raw}}) *{{.type|public}} {
+func (c *{{.type|public}}) Prepend(items ...{{.elemtype|raw}}) *{{.type|public}} {
 {{ if .immutable -}}
 	d := c.Copy()
 	d.items = append(items, d.items...)
@@ -142,9 +142,9 @@ func (c *{{.type|public}}) Prepend(items ...{{.type|raw}}) *{{.type|public}} {
 {{ end -}}
 }
 
-// Copy creates a copy of the collection and the underlying {{.type|raw}} slice.
+// Copy creates a copy of the collection and the underlying {{.elemtype|raw}} slice.
 func (c *{{.type|public}}) Copy() *{{.type|public}} {
-	s := make([]{{.type|raw}}, c.Len(), c.Len())
+	s := make([]{{.elemtype|raw}}, c.Len(), c.Len())
 	copy(s, c.items)
 
 	return New{{.type|public}}(s)
@@ -157,7 +157,7 @@ func (c *{{.type|public}}) Copy() *{{.type|public}} {
 // Filter removes all items from the collection for which fn evaluates to
 // false and returns c.
 {{- end }}
-func (c *{{.type|public}}) Filter(fn func({{.type|raw}}) bool) *{{.type|public}} {
+func (c *{{.type|public}}) Filter(fn func({{.elemtype|raw}}) bool) *{{.type|public}} {
 {{ if .immutable -}}
 	d := c.Copy()
 	s := d.items[:0]
@@ -168,7 +168,7 @@ func (c *{{.type|public}}) Filter(fn func({{.type|raw}}) bool) *{{.type|public}}
 		}
 	}
 
-	var zeroValue {{.type|raw}}
+	var zeroValue {{.elemtype|raw}}
 
 	for i := len(s); i < len(d.items); i++ {
 		d.items[i] = zeroValue
@@ -186,7 +186,7 @@ func (c *{{.type|public}}) Filter(fn func({{.type|raw}}) bool) *{{.type|public}}
 		}
 	}
 
-	var zeroValue {{.type|raw}}
+	var zeroValue {{.elemtype|raw}}
 
 	for i := len(s); i < len(c.items); i++ {
 		c.items[i] = zeroValue
@@ -205,7 +205,7 @@ func (c *{{.type|public}}) Filter(fn func({{.type|raw}}) bool) *{{.type|public}}
 // Collect removes all items from the collection for which fn evaluates to
 // false and returns c.
 {{- end }}
-func (c *{{.type|public}}) Collect(fn func({{.type|raw}}) bool) *{{.type|public}} {
+func (c *{{.type|public}}) Collect(fn func({{.elemtype|raw}}) bool) *{{.type|public}} {
 	return c.Filter(fn)
 }
 
@@ -216,8 +216,8 @@ func (c *{{.type|public}}) Collect(fn func({{.type|raw}}) bool) *{{.type|public}
 // Reject removes all items from the collection for which fn evaluates to
 // true and returns c.
 {{- end }}
-func (c *{{.type|public}}) Reject(fn func({{.type|raw}}) bool) *{{.type|public}} {
-	return c.Filter(func(v {{.type|raw}}) bool {
+func (c *{{.type|public}}) Reject(fn func({{.elemtype|raw}}) bool) *{{.type|public}} {
+	return c.Filter(func(v {{.elemtype|raw}}) bool {
 		return !fn(v)
 	})
 }
@@ -225,9 +225,9 @@ func (c *{{.type|public}}) Reject(fn func({{.type|raw}}) bool) *{{.type|public}}
 // Partition partitions the collection into two new collections. The first
 // collection contains all items where fn evaluates to true, the second one all
 // items where fn evaluates to false.
-func (c *{{.type|public}}) Partition(fn func({{.type|raw}}) bool) (*{{.type|public}}, *{{.type|public}}) {
-	lhs := make([]{{.type|raw}}, 0, c.Len())
-	rhs := make([]{{.type|raw}}, 0, c.Len())
+func (c *{{.type|public}}) Partition(fn func({{.elemtype|raw}}) bool) (*{{.type|public}}, *{{.type|public}}) {
+	lhs := make([]{{.elemtype|raw}}, 0, c.Len())
+	rhs := make([]{{.elemtype|raw}}, 0, c.Len())
 
 	for _, item := range c.items {
 		if fn(item) {
@@ -243,8 +243,8 @@ func (c *{{.type|public}}) Partition(fn func({{.type|raw}}) bool) (*{{.type|publ
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.{{if .immutable}} The result is a new collection. The original
 // collection is not modified.{{end}}
-func (c *{{.type|public}}) Map(fn func({{.type|raw}}) {{.type|raw}}) *{{.type|public}} {
-	return c.MapIndex(func(item {{.type|raw}}, _ int) {{.type|raw}} {
+func (c *{{.type|public}}) Map(fn func({{.elemtype|raw}}) {{.elemtype|raw}}) *{{.type|public}} {
+	return c.MapIndex(func(item {{.elemtype|raw}}, _ int) {{.elemtype|raw}} {
 		return fn(item)
 	})
 }
@@ -252,7 +252,7 @@ func (c *{{.type|public}}) Map(fn func({{.type|raw}}) {{.type|raw}}) *{{.type|pu
 // MapIndex calls fn for each item in the collection an replaces its value with the
 // result of fn.{{if .immutable}} The result is a new collection. The original
 // collection is not modified.{{end}}
-func (c *{{.type|public}}) MapIndex(fn func({{.type|raw}}, int) {{.type|raw}}) *{{.type|public}} {
+func (c *{{.type|public}}) MapIndex(fn func({{.elemtype|raw}}, int) {{.elemtype|raw}}) *{{.type|public}} {
 {{ if .immutable -}}
 	d := c.Copy()
 
@@ -274,9 +274,9 @@ func (c *{{.type|public}}) MapIndex(fn func({{.type|raw}}, int) {{.type|raw}}) *
 
 // Reduce calls fn for each item in c and reduces the result into reducer. The
 // reducer contains the value returned by the call to fn for the previous item.
-// Reducer will be the zero {{.type|raw}} value on the first invocation.
-func (c *{{.type|public}}) Reduce(fn func(reducer {{.type|raw}}, item {{.type|raw}}) {{.type|raw}}) {{.type|raw}} {
-	var reducer {{.type|raw}}
+// Reducer will be the zero {{.elemtype|raw}} value on the first invocation.
+func (c *{{.type|public}}) Reduce(fn func(reducer {{.elemtype|raw}}, item {{.elemtype|raw}}) {{.elemtype|raw}}) {{.elemtype|raw}} {
+	var reducer {{.elemtype|raw}}
 
 	for _, item := range c.items {
 		reducer = fn(reducer, item)
@@ -287,9 +287,9 @@ func (c *{{.type|public}}) Reduce(fn func(reducer {{.type|raw}}, item {{.type|ra
 
 // Find returns the first item for which fn evaluates to true. If the
 // collection does not contain a matching item, Find will return the zero
-// {{.type|raw}} value. If you need to distinguish zero values from a condition
+// {{.elemtype|raw}} value. If you need to distinguish zero values from a condition
 // that did not match any item consider using FindOk instead.
-func (c *{{.type|public}}) Find(fn func({{.type|raw}}) bool) {{.type|raw}} {
+func (c *{{.type|public}}) Find(fn func({{.elemtype|raw}}) bool) {{.elemtype|raw}} {
 	item, _ := c.FindOk(fn)
 
 	return item
@@ -297,21 +297,21 @@ func (c *{{.type|public}}) Find(fn func({{.type|raw}}) bool) {{.type|raw}} {
 
 // FindOk returns the first item for which fn evaluates to true. If the
 // collection does not contain a matching item, FindOk will return the zero
-// {{.type|raw}} value. The second return value denotes whether the condition
+// {{.elemtype|raw}} value. The second return value denotes whether the condition
 // matched any item or not.
-func (c *{{.type|public}}) FindOk(fn func({{.type|raw}}) bool) ({{.type|raw}}, bool) {
+func (c *{{.type|public}}) FindOk(fn func({{.elemtype|raw}}) bool) ({{.elemtype|raw}}, bool) {
 	for _, item := range c.items {
 		if fn(item) {
 			return item, true
 		}
 	}
 
-	var zeroValue {{.type|raw}}
+	var zeroValue {{.elemtype|raw}}
 	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
-func (c *{{.type|public}}) Any(fn func({{.type|raw}}) bool) bool {
+func (c *{{.type|public}}) Any(fn func({{.elemtype|raw}}) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
 			return true
@@ -322,7 +322,7 @@ func (c *{{.type|public}}) Any(fn func({{.type|raw}}) bool) bool {
 }
 
 // All returns true if fn evaluates to true for all items in c.
-func (c *{{.type|public}}) All(fn func({{.type|raw}}) bool) bool {
+func (c *{{.type|public}}) All(fn func({{.elemtype|raw}}) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
 			return false
@@ -333,7 +333,7 @@ func (c *{{.type|public}}) All(fn func({{.type|raw}}) bool) bool {
 }
 
 // Contains returns true if the collection contains el.
-func (c *{{.type|public}}) Contains(el {{.type|raw}}) bool {
+func (c *{{.type|public}}) Contains(el {{.elemtype|raw}}) bool {
 	for _, item := range c.items {
 {{ if .equalityFunc -}}
 		if {{.equalityFunc}}(item, el) {
@@ -352,7 +352,7 @@ func (c *{{.type|public}}) Contains(el {{.type|raw}}) bool {
 // The result will be a copy of c which is sorted, the original collection is
 // not altered.
 {{- end }}
-func (c *{{.type|public}}) Sort(fn func({{.type|raw}}, {{.type|raw}}) bool) *{{.type|public}} {
+func (c *{{.type|public}}) Sort(fn func({{.elemtype|raw}}, {{.elemtype|raw}}) bool) *{{.type|public}} {
 {{ if .immutable -}}
 	d := c.Copy()
 	sort.Slice(d.items, d.lessFunc(fn))
@@ -365,11 +365,11 @@ func (c *{{.type|public}}) Sort(fn func({{.type|raw}}, {{.type|raw}}) bool) *{{.
 
 // IsSorted returns true if the collection is sorted in the order defined by
 // the passed in comparator func.
-func (c *{{.type|public}}) IsSorted(fn func({{.type|raw}}, {{.type|raw}}) bool) bool {
+func (c *{{.type|public}}) IsSorted(fn func({{.elemtype|raw}}, {{.elemtype|raw}}) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
 
-func (c *{{.type|public}}) lessFunc(fn func({{.type|raw}}, {{.type|raw}}) bool) func(int, int) bool {
+func (c *{{.type|public}}) lessFunc(fn func({{.elemtype|raw}}, {{.elemtype|raw}}) bool) func(int, int) bool {
 	return func(i, j int) bool {
 		return fn(c.items[i], c.items[j])
 	}
@@ -418,7 +418,7 @@ func (c *{{.type|public}}) Remove(pos int) *{{.type|public}} {
 {{- if .immutable }}
 // The result is a new collection, the original is not modified.
 {{- end }}
-func (c *{{.type|public}}) RemoveItem(item {{.type|raw}}) *{{.type|public}} {
+func (c *{{.type|public}}) RemoveItem(item {{.elemtype|raw}}) *{{.type|public}} {
 {{ if .immutable -}}
 	d := c.Copy()
 
@@ -453,8 +453,8 @@ func (c *{{.type|public}}) RemoveItem(item {{.type|raw}}) *{{.type|public}} {
 {{- if .immutable }}
 // The result is a new collection, the original is not modified.
 {{- end }}
-func (c *{{.type|public}}) InsertItem(item {{.type|raw}}, pos int) *{{.type|public}} {
-    var zeroValue {{.type|raw}}
+func (c *{{.type|public}}) InsertItem(item {{.elemtype|raw}}, pos int) *{{.type|public}} {
+    var zeroValue {{.elemtype|raw}}
 {{ if .immutable -}}
 	d := c.Copy()
 	d.items = append(d.items, zeroValue)
@@ -469,23 +469,23 @@ func (c *{{.type|public}}) InsertItem(item {{.type|raw}}, pos int) *{{.type|publ
 {{ end -}}
 }
 
-// Cut returns a copy of the underlying {{.type|raw}} slice with the items
+// Cut returns a copy of the underlying {{.elemtype|raw}} slice with the items
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
-func (c *{{.type|public}}) Cut(i, j int) []{{.type|raw}} {
+func (c *{{.type|public}}) Cut(i, j int) []{{.elemtype|raw}} {
 {{ if .immutable -}}
 	d := c.Copy()
 	return append(d.items[:i], d.items[j:]...)
 {{ else -}}
-	s := make([]{{.type|raw}}, 0, c.Len())
+	s := make([]{{.elemtype|raw}}, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 {{ end -}}
 }
 
-// Slice returns the {{.type|raw}} items between slice index i and j. Will
+// Slice returns the {{.elemtype|raw}} items between slice index i and j. Will
 // panic if i or j is out of bounds.
-func (c *{{.type|public}}) Slice(i, j int) []{{.type|raw}} {
+func (c *{{.type|public}}) Slice(i, j int) []{{.elemtype|raw}} {
 {{ if .immutable -}}
 	return c.Copy().items[i:j]
 {{ else -}}

@@ -24,6 +24,12 @@ type typeOptions struct {
 	suffix       string
 }
 
+func defaultTypeOptions() typeOptions {
+	return typeOptions{
+		suffix: "collection",
+	}
+}
+
 func extractEnabledTag(t *types.Type) bool {
 	values := extractCommentTags(t)[tagName]
 	if values == nil {
@@ -42,9 +48,7 @@ func extractOptionTags(t *types.Type) ([]typeOptions, error) {
 			continue
 		}
 
-		options := typeOptions{
-			suffix: "collection",
-		}
+		options := defaultTypeOptions()
 
 		var noPrefix, noSuffix bool
 

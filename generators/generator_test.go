@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"k8s.io/gengo/generator"
 	"k8s.io/gengo/namer"
 	"k8s.io/gengo/types"
@@ -139,6 +140,7 @@ func TestCollectionGen_equalityFuncName(t *testing.T) {
 				imports: generator.NewImportTracker(),
 				options: typeOptions{equalityFunc: "Equal"},
 			},
+			typ:      &types.Type{Kind: types.Struct},
 			expected: "Equal",
 			validateImports: func(t *testing.T, tracker namer.ImportTracker) {
 				lines := tracker.ImportLines()
@@ -147,16 +149,38 @@ func TestCollectionGen_equalityFuncName(t *testing.T) {
 			},
 		},
 		{
+			name: "package local equalityFunc, different output package",
+			gen: &collectionGen{
+				imports: generator.NewImportTracker(),
+				options: typeOptions{equalityFunc: "Equal"},
+			},
+			typ: &types.Type{
+				Kind: types.Struct,
+				Name: types.Name{
+					Name:    "Foo",
+					Package: "github.com/martinohmann/foo",
+				},
+			},
+			expected: "foo.Equal",
+			validateImports: func(t *testing.T, tracker namer.ImportTracker) {
+				lines := tracker.ImportLines()
+
+				require.Len(t, lines, 1)
+				assert.Equal(t, `foo "github.com/martinohmann/foo"`, lines[0])
+			},
+		},
+		{
 			name: "equalityFunc from another package",
 			gen: &collectionGen{
 				imports: generator.NewImportTracker(),
 				options: typeOptions{equalityFunc: "bytes.Equal"},
 			},
+			typ:      &types.Type{Kind: types.Struct},
 			expected: "bytes.Equal",
 			validateImports: func(t *testing.T, tracker namer.ImportTracker) {
 				lines := tracker.ImportLines()
 
-				assert.Len(t, lines, 1)
+				require.Len(t, lines, 1)
 				assert.Equal(t, `bytes "bytes"`, lines[0])
 			},
 		},
