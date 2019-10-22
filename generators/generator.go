@@ -58,15 +58,7 @@ func Packages(_ *generator.Context, arguments *args.GeneratorArgs) generator.Pac
 				}
 
 				if len(options) == 0 {
-					generators = append(generators, &collectionGen{
-						DefaultGen: generator.DefaultGen{
-							OptionalName: c.Namers["file"].Name(t),
-						},
-						imports:       generator.NewImportTracker(),
-						outputPackage: arguments.OutputPackagePath,
-						typeToMatch:   t,
-					})
-					continue
+					options = append(options, defaultTypeOptions())
 				}
 
 				for _, opts := range options {
@@ -120,21 +112,28 @@ func (g *collectionGen) Imports(c *generator.Context) []string {
 
 // GenerateType implements the generator.Generator interface.
 func (g *collectionGen) GenerateType(c *generator.Context, t *types.Type, w io.Writer) error {
-	if g.options.underlying {
-		t = underlying(t)
-	}
+	elemType := g.elementType(t)
 
-	klog.Infof("Generating collection for type %s (%s)", t.Name, t.Kind)
+	klog.Infof("Generating collection for type %s (%s)", elemType.Name, elemType.Kind)
 	klog.V(1).Infof("with options: %+v", g.options)
 
 	sw := generator.NewSnippetWriter(w, c, "{{", "}}")
 	sw.Do(collectionCode, generator.Args{
 		"type":         t,
+		"elemtype":     elemType,
 		"immutable":    g.options.immutable,
 		"equalityFunc": g.equalityFuncName(c, t),
 	})
 
 	return sw.Error()
+}
+
+func (g *collectionGen) elementType(t *types.Type) *types.Type {
+	if g.options.underlying {
+		return underlying(t)
+	}
+
+	return t
 }
 
 // equalityFuncName builds the name of the func used for equality checks on the
@@ -166,7 +165,13 @@ func (g *collectionGen) equalityFuncName(c *generator.Context, t *types.Type) st
 
 	name := types.ParseFullyQualifiedName(equalityFunc)
 	if name.Package == "" {
-		return name.Name
+		if g.outputPackage == t.Name.Package {
+			// If the output package is identical to the package of the type we
+			// can use the func name as is without the package name.
+			return name.Name
+		}
+
+		name.Package = t.Name.Package
 	}
 
 	f := c.Universe.Function(name)
