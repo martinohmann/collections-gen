@@ -1,4 +1,4 @@
-package simple
+package immutable
 
 //go:generate collections-gen -i github.com/martinohmann/collections-gen/examples/immutable -p github.com/martinohmann/collections-gen/examples/immutable
 
