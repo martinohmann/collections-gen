@@ -22,6 +22,10 @@ test: ## run tests
 generate: install ## run go generate
 	go generate $$(go list ./... | grep -v /vendor/)
 
+.PHONY: verify-codegen
+verify-codegen: ## verify generated code is uptodate
+	scripts/verify-codegen
+
 .PHONY: coverage
 coverage: ## generate code coverage
 	scripts/coverage
