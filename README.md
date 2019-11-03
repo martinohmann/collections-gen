@@ -11,6 +11,10 @@ generate collections code based on tags in the doc blocks preceeding a type. It
 identifies the types needing code generation by the comment tag
 `+collections-gen`.
 
+If you are looking for ready-to-use collections for builtin types and generic
+slices, check out the
+[collections-go](https://github.com/martinohmann/collections-go) package.
+
 Simple example
 --------------
 
