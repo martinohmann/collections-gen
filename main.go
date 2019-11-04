@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/martinohmann/collections-gen/generators"
+	"github.com/martinohmann/collections-gen/internal/generator"
 	"k8s.io/gengo/args"
 
 	"k8s.io/klog"
@@ -17,9 +17,9 @@ func main() {
 	arguments.GoHeaderFilePath = ""
 
 	if err := arguments.Execute(
-		generators.NameSystems(),
-		generators.DefaultNameSystem(),
-		generators.Packages,
+		generator.NameSystems(),
+		generator.DefaultNameSystem(),
+		generator.Packages,
 	); err != nil {
 		klog.Errorf("Error: %v", err)
 		os.Exit(1)

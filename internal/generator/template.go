@@ -1,4 +1,4 @@
-package generators
+package generator
 
 var collectionCode = `
 // {{.type|public}} is a{{if .immutable}}n immutable{{end}} collection of {{.elemtype|raw}} values.
